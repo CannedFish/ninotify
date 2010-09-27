@@ -133,7 +133,7 @@ static void Callback(EV_P_ ev_io *w, int revents) {
             string file_path = event->len ? niStruct.ni_pairs[event->wd].watched_file + "/" + event->name : niStruct.ni_pairs[event->wd].watched_file;
             ofstream events_file;
             events_file.open(niStruct.ni_pairs[event->wd].events_file.c_str(), ios::out | ios::app);
-            events_file << event->wd << " " << event->mask << " " << file_path << "\n";
+            events_file << "ninotify " << event->wd << " " << event->mask << " " << file_path << "\n";
             events_file.close();
             i += EVENT_SIZE + event->len;
         }
