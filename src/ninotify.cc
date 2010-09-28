@@ -70,7 +70,9 @@ static Handle<Value> AddWatch(const Arguments& args) {
     String::Utf8Value dir_path_(args[0]);
     string dir_path(*dir_path_);
 
-    Local<Array> excluded_ = Local<Array>::Cast(args[1]->ToObject());
+    uint32_t mask = args[1]->ToUint32()->Int32Value();
+
+    Local<Array> excluded_ = Local<Array>::Cast(args[2]->ToObject());
 
     for (uint32_t i = 0; i < excluded_->Length(); i++) {
         Local<Value> elem = excluded_->Get(i);
@@ -80,11 +82,11 @@ static Handle<Value> AddWatch(const Arguments& args) {
         }
     }
 
-    String::Utf8Value events_file_(args[2]);
+    String::Utf8Value events_file_(args[3]);
     string events_file(*events_file_);
 
     vector<int> wds;
-    AddInotifyWatch(dir_path, excluded, wds, events_file);
+    AddInotifyWatch(dir_path, mask, excluded, wds, events_file);
 
     return Undefined();
 }
@@ -150,7 +152,7 @@ void InitInotify() {
     ev_io_start(EV_DEFAULT_UC_ &niStruct.read_watcher);
 }
 
-void AddInotifyWatch(string& dir_path, set<string>& excluded, vector<int>& wds, string& events_file) {
+void AddInotifyWatch(string& dir_path, int mask, set<string>& excluded, vector<int>& wds, string& events_file) {
     if (niStruct.fd == -1) {
         InitInotify();
     }
@@ -159,7 +161,7 @@ void AddInotifyWatch(string& dir_path, set<string>& excluded, vector<int>& wds, 
     dirs.push_back(dir_path);
 
     for (int i = 0; i < dirs.size(); i++) {
-        int wd = inotify_add_watch(niStruct.fd, dirs[i].c_str(), IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MODIFY | IN_MOVE_SELF | IN_MOVE);
+        int wd = inotify_add_watch(niStruct.fd, dirs[i].c_str(), mask);
         niPair data;
         data.events_file = events_file;
         data.watched_file = dirs[i];

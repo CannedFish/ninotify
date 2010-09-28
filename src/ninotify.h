@@ -25,7 +25,7 @@ static int GetDirs(string& dir_path, vector<string>& sub_dirs, set<string>& excl
 
 void InitInotify();
 
-void AddInotifyWatch(string& dir_path, set<string>& excluded, vector<int>& wds, string& events_file);
+void AddInotifyWatch(string& dir_path, int mask, set<string>& excluded, vector<int>& wds, string& events_file);
 
 void RemoveInotifyWatch();
 
