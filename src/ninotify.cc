@@ -143,7 +143,7 @@ static void Callback(EV_P_ ev_io *w, int revents) {
 }
 
 void InitInotify() {
-    niStruct.fd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+    niStruct.fd = inotify_init();
 
     FD_ZERO(&niStruct.rfds);
     FD_SET(niStruct.fd, &niStruct.rfds);
