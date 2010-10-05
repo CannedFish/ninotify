@@ -159,6 +159,7 @@ void AddInotifyWatch(string& dir_path, int mask, set<string>& excluded, vector<i
 
     vector<string> dirs;
     dirs.push_back(dir_path);
+    GetDirs(dir_path, dirs, excluded, true);
 
     for (int i = 0; i < dirs.size(); i++) {
         int wd = inotify_add_watch(niStruct.fd, dirs[i].c_str(), mask);
