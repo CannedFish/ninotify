@@ -1,4 +1,4 @@
-var ninotify = require('./build/default/ninotify.node');
+var ninotify = require('./lib/build/default/ninotify.node');
 
 exports.IN_ACCESS = ninotify.IN_ACCESS;
 exports.IN_MODIFY = ninotify.IN_MODIFY;
