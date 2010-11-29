@@ -1,7 +1,7 @@
 {
     "name" : "ninotify",
     "description" : "Node.js inotify addon",
-    "version" : "0.0.1",
+    "version" : "0.0.2",
     "homepage": "http://github.com/afelix/ninotify",
     "author" : "Sergey Kryzhanovsky <skryzhanovsky@gmail.com> (http://github.com/afelix)",
     "repository" : {
