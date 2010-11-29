@@ -67,26 +67,16 @@ static Handle<Value> AddWatch(const Arguments& args) {
 
     set<string> excluded;
 
-    String::Utf8Value dir_path_(args[0]);
-    string dir_path(*dir_path_);
+    String::Utf8Value path_(args[0]);
+    string path(*path_);
 
     uint32_t mask = args[1]->ToUint32()->Int32Value();
 
-    Local<Array> excluded_ = Local<Array>::Cast(args[2]->ToObject());
-
-    for (uint32_t i = 0; i < excluded_->Length(); i++) {
-        Local<Value> elem = excluded_->Get(i);
-        if (elem->IsString()) {
-            String::Utf8Value dir_path_name_(elem);
-            excluded.insert(string(*dir_path_name_));
-        }
-    }
-
-    String::Utf8Value events_file_(args[3]);
+    String::Utf8Value events_file_(args[2]);
     string events_file(*events_file_);
 
     vector<int> wds;
-    AddInotifyWatch(dir_path, mask, excluded, wds, events_file);
+    AddInotifyWatch(path, mask, wds, events_file);
 
     return Undefined();
 }
@@ -152,23 +142,17 @@ void InitInotify() {
     ev_io_start(EV_DEFAULT_UC_ &niStruct.read_watcher);
 }
 
-void AddInotifyWatch(string& dir_path, int mask, set<string>& excluded, vector<int>& wds, string& events_file) {
+void AddInotifyWatch(string& path, int mask, vector<int>& wds, string& events_file) {
     if (niStruct.fd == -1) {
         InitInotify();
     }
 
-    vector<string> dirs;
-    dirs.push_back(dir_path);
-    GetDirs(dir_path, dirs, excluded, true);
-
-    for (int i = 0; i < dirs.size(); i++) {
-        int wd = inotify_add_watch(niStruct.fd, dirs[i].c_str(), mask);
-        niPair data;
-        data.events_file = events_file;
-        data.watched_file = dirs[i];
-        niStruct.ni_pairs[wd] = data;
-        wds.push_back(wd);
-    }
+    int wd = inotify_add_watch(niStruct.fd, path.c_str(), mask);
+    niPair data;
+    data.events_file = events_file;
+    data.watched_file = path;
+    niStruct.ni_pairs[wd] = data;
+    wds.push_back(wd);
 }
 
 void RemoveInotifyWatch() {
@@ -178,48 +162,6 @@ void RemoveInotifyWatch() {
 void RemoveAllInotifyWatches() {
     // TODO: implement
     ev_io_stop(EV_A_ &niStruct.read_watcher);
-}
-
-static int GetDirs(string& dir_path, vector<string>& sub_dirs, set<string>& excluded, bool recursive) {
-    int dirs_count = 0;
-
-    char* c_dir_path = new char[dir_path.size()+1];
-    strcpy(c_dir_path, dir_path.c_str());
-
-    DIR *dp;
-    struct dirent *de;
-    struct stat dir_stat;
-    string full_dir_path, dir_name;
-
-    dp = opendir(c_dir_path);
-    if (dp != NULL) {
-        de = readdir(dp);
-        if (de != NULL) { // "."
-            do {
-                if (strcmp(de->d_name, ".") != 0 && strcmp(de->d_name, "..") != 0) {
-                    dir_name = string(de->d_name);
-                    full_dir_path = dir_path + "/" + dir_name;
-                    lstat(full_dir_path.c_str(), &dir_stat);
-                    if (S_ISDIR(dir_stat.st_mode)) {
-                        if (excluded.find(dir_name) == excluded.end()) {
-                            sub_dirs.push_back(full_dir_path);
-                            dirs_count++;
-                            if (recursive) {
-                                dirs_count += GetDirs(full_dir_path, sub_dirs, excluded, recursive);
-                            }
-                        }
-                    }
-                }
-            } while((de = readdir(dp)) != NULL);
-        } else {
-            cout << "error reading dir: " << c_dir_path << "\n";
-        }
-        closedir(dp);
-    } else {
-        cout << "error opening dir: " << c_dir_path << "\n";
-    }
-
-    return dirs_count;
 }
 
 extern "C" void init(Handle<Object> target) {

@@ -21,11 +21,9 @@ static Handle<Value> RemoveAllWatches(const Arguments& args);
 
 static void Callback(EV_P_ ev_io *w, int revents);
 
-static int GetDirs(string& dir_path, vector<string>& sub_dirs, set<string>& excluded, bool recursive);
-
 void InitInotify();
 
-void AddInotifyWatch(string& dir_path, int mask, set<string>& excluded, vector<int>& wds, string& events_file);
+void AddInotifyWatch(string& path, int mask, vector<int>& wds, string& events_file);
 
 void RemoveInotifyWatch();
 
