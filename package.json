@@ -1,7 +1,7 @@
 {
     "name" : "ninotify",
     "description" : "Node.js inotify addon",
-    "version" : "0.0.3",
+    "version" : "0.0.4",
     "homepage": "http://github.com/afelix/ninotify",
     "author" : "Sergey Kryzhanovsky <skryzhanovsky@gmail.com> (http://github.com/afelix)",
     "repository" : {
@@ -9,10 +9,10 @@
         "url" : "http://github.com/afelix/ninotify.git"
     },
     "main" : "ninotify",
-    "directories" : { "lib" : "./lib" },
+    "directories" : { "src" : "./src" },
     "scripts" : {
-        "preinstall" : "cd lib && node-waf configure",
-        "install" : "cd lib && node-waf build"
+        "preinstall" : "cd src && node-waf configure",
+        "install" : "cd src && node-waf build"
     },
     "engines" : { "node" : ">=0.4.0" },
     "licenses" : [ { "type" : "AS IS" } ]
